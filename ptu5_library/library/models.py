@@ -8,6 +8,9 @@ class Genre(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        ordering = ['name']
+
 # models.Model  django funkcija, models importuoja Model, panasiai kaip sqlalchemy Base
 class Author(models.Model):
     first_name = models.CharField('first name', max_length = 50)
@@ -16,8 +19,14 @@ class Author(models.Model):
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
 
+    def display_books(self) -> str:
+        return ", ".join(book.title for book in self.books.all())
+    display_books.short_description = 'Books'
+
     class Meta:
         ordering = ['last_name', 'first_name']
+        verbose_name = 'author'
+        verbose_name_plural = 'authors'
 
 # charfield yra duomenu bazes efektyvus duomenu laukas, lengvai rusiuojasi, indeksuojasi
 # textfield yra sunkus duomenu laukas, neturi limito su length
@@ -30,14 +39,21 @@ class Book(models.Model):
     # protect neleis istrinti autoriaus, jei jis turi knygas
     # set_null jei istirnsim autoriu, prie knygu rodys autoriu null
     # cascade jei istrinsime autoriu istrins ir jo visas knygas
-    author = models.ForeignKey(Author, on_delete = models.SET_NULL, null = True, blank = True)
+    author = models.ForeignKey(Author, on_delete = models.SET_NULL, null = True, blank = True, related_name = 'books',)
     genre = models.ManyToManyField(Genre, help_text = 'Choose genre(s) for this book', verbose_name = 'genre(s)')
 
     def __str__(self):
         return f"{self.author} - {self.title}"
 
+    def display_genre(self):
+        return ', '.join(genre.name for genre in self.genre.all()[:3])
+    display_genre.short_description = 'genre(s)'
+
     # kai sukuriam modeli radom python manage.py makemigrations
     # tada python manage.py migrate
+
+# pirmos reiksmes kabutese yra verbose_name jei nenurodome verbose_name, tai turime juos pirmus nurodyti
+# jei bus foreign key tai pirmas turi eiti klases objektas
 
 class BookInstance(models.Model):
     unique_id = models.UUIDField('unique ID', default = uuid.uuid4, editable = False)
@@ -57,7 +73,6 @@ class BookInstance(models.Model):
         choices = LOAN_STATUS, 
         default = 'm')
 
-    price = models.DecimalField('price', max_digits = 18, decimal_places = 2) # decimal_places, skaicius po kablelio
 
     def __str__(self):
         return f"{self.unique_id} : {self.book.title}"
