@@ -1,0 +1,11 @@
+{% extends 'library/base.html' %}
+{% block title %} {{ author }} Books in {{ block.super }} {% endblock title %}
+{% block content %}
+    <h1>{{ author }} Books </h1>
+    <ul>
+        {% comment %} author.books eina is models klases Book, nes ten kai darem foreign key, nurodeme related name books {% endcomment %}
+        {% for book in author.books.all %}
+        <li>{{ book }}</li>
+        {% endfor %}
+    </ul>
+{% endblock content %}

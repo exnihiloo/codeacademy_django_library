@@ -9,9 +9,28 @@
     <link rel='stylesheet' href="{% static 'library/css/base.css' %}">
 </head>
 <body>
+    <header>
+        {# meniukas#}
+        {% comment %} ta url 'books' nusirodome pagal tai koki name sukureme urls.py path'uose {% endcomment %}
+        <div class="container">
+            {% block nav %}
+            <a href="{% url 'index' %}">Home</a>
+            <a href="{% url 'authors' %}">Authors</a>
+            <a href="{% url 'books' %}">Books</a>
+            <a href="{% url 'admin:index' %}">Admin</a>
+            {% endblock nav %}
+        </div>
+    </header>
     <main>
-        {% block content %}
-        {% endblock content %}
+        <div class="container">
+            {% block content %}
+            {% endblock content %}
+        </div>
     </main>
+    <footer>
+        <div class="container">
+            {% block footer %}<p> (C) 2022 PTU5 kurso biblioteka </p>{% endblock footer %}
+        </div>
+    </footer>
 </body>
 </html>

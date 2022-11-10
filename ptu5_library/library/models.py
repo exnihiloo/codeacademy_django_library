@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils.html import format_html
+from django.urls import reverse
 import uuid
 
 # Create your models here.
@@ -7,6 +9,10 @@ class Genre(models.Model):
 
     def __str__(self):
         return self.name
+
+    def link_filtered_books(self) -> str:
+        link = reverse('books') + '?genre_id='+str(self.id)
+        return format_html('<a class="genre" href="{link}">{name}</a>', link = link, name = self.name)
 
     class Meta:
         ordering = ['name']
@@ -22,6 +28,10 @@ class Author(models.Model):
     def display_books(self) -> str:
         return ", ".join(book.title for book in self.books.all())
     display_books.short_description = 'Books'
+
+    def link(self) -> str:
+        link = reverse('author', kwargs={'author_id' : self.id})
+        return format_html('<a href="{link}">{author}</a>', link = link, author = self.__str__())
 
     class Meta:
         ordering = ['last_name', 'first_name']
@@ -48,6 +58,12 @@ class Book(models.Model):
     def display_genre(self):
         return ', '.join(genre.name for genre in self.genre.all()[:3])
     display_genre.short_description = 'genre(s)'
+
+    # reverse suformuoja adresa
+
+    # def author_link(self) -> str:
+    #     link = reverse('author', kwargs = {'author_id' : self.author.id})
+    #     return format_html('<a href="{link}">{author}</a>', link = link, author = self.author)
 
     # kai sukuriam modeli radom python manage.py makemigrations
     # tada python manage.py migrate
