@@ -1,6 +1,9 @@
 from django.shortcuts import render, get_object_or_404
 # from django.http import HttpResponse
+from django.db.models import Q
 from django.views.generic import ListView, DetailView
+from django.core.paginator import Paginator
+
 
 from . models import Genre, Author, Book, BookInstance
 # Create your views here.
@@ -27,7 +30,10 @@ def index(request):
 # funkciniai views.
 # autoriu funkcija
 def authors(request):
-    return render(request, 'library/authors.html', {'authors' : Author.objects.all()})
+    paginator = Paginator(Author.objects.all(), 2)
+    page_number = request.GET.get('page')
+    paged_authors = paginator.get_page(page_number)
+    return render(request, 'library/authors.html', {'authors' : paged_authors})
 
 # author detail funkcija
 def author(request, author_id):
@@ -37,11 +43,15 @@ def author(request, author_id):
 
 class BookListView(ListView):
     model = Book
+    paginate_by = 2
     template_name = 'library/book_list.html'
 
     #is get kolekcijos argumentu pabandysime gauti zanro id
     def get_queryset(self):
         queryset = super().get_queryset()
+        query = self.request.GET.get('query')
+        if query:
+            queryset = queryset.filter(Q(title__icontains = query) | Q(summary__icontains = query))
         genre_id = self.request.GET.get('genre_id')
         if genre_id:
             queryset = queryset.filter(genre__id = genre_id)
@@ -65,3 +75,9 @@ class BookListView(ListView):
 class BookDetailView(DetailView):
     model = Book
     template_name = 'library/book_detail.html'
+
+
+# def search(request):
+#     query = request.GET.get('query')
+#     search_results = Book.objects.filter(Q(title__icontains = query) | Q(summary__icontains = query))
+#     return render(request, 'library/search.html', {'books' : search_results, 'query' : query})

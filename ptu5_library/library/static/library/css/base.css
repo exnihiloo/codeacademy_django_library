@@ -65,3 +65,80 @@ footer .container {
     display: flex;
     align-content: stretch;
 }
+
+.genre_filter {
+    float: right;
+    background-color: rgb(156, 156, 201);
+}
+
+.genre_filter .current {
+    background-color: rgb(157, 31, 241);
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+ul li {
+    padding: 0.5rem 1rem;
+    
+}
+
+ul li a {
+    color: rgb(12, 12, 135);
+    
+}
+
+ul li:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.paginator {
+    margin: 1rem;
+}
+
+.paginator a, .paginator span {
+    display: inline-block;
+    padding: 0.3rem;
+    margin: 1px;
+    text-decoration: none;
+    border: 1px solid grey;
+    border-radius: 1rem;
+}
+/* border-radius suaplvalina mygtukus */
+
+.paginator span {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: rgb(72, 255, 16);
+}
+
+.paginator a {
+    background-color: rgb(58, 250, 141);
+}   
+
+.paginator form {
+    display: inline-block;
+}
+
+ul.book_list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+ul.book_list li.book {
+    flex-basis: 15rem;
+    border: 1px solid rgb(141, 55, 55);
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 0;
+}
+
+ul.book_list li.book img {
+    max-width: 100%;
+}
+
+ul.book_list li.book h3 {
+    margin-top: 0;
+}

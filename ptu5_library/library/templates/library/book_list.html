@@ -1,22 +1,48 @@
 {% extends 'library/base.html' %}
+{% load static %}
 {% block title %}Books in {{ block.super }} {% endblock title %}
 {% block content %}
     <h1>{{ books_count }}
         {% comment %} rodys kiek kokio zanro knygu yra reikia vesti http://127.0.0.1:8000/books/?genre_id=4 {% endcomment %}
         {% if genre %}{{ genre }}{% endif%}
         Books</h1>
+    <div class="paginator">
+        {% if page_obj.has_previous %}
+            <a href = "?{% if request.GET.query %}query={{request.GET.query}}&{% endif %}page=1">&#8676;</a>
+            {% comment %} negali buti tarpo "?page={{ tarp lygu ir skliausto { {% endcomment %}
+            <a href = "?{% if request.GET.query %}query={{request.GET.query}}&{% endif %}page={{ page_obj.previous_page_number}}">&#8592;</a>
+        {% endif %}
+        {{ page_obj.number}} iš {{ page_obj.paginator.num_pages }}
+        {% if page_obj.has_next %}
+            <a href = "?{% if request.GET.query %}query={{request.GET.query}}&{% endif %}page={{ page_obj.next_page_number }}">&#8594;</a>
+            <a href = "?{% if request.GET.query %}query={{request.GET.query}}&{% endif %}page={{ page_obj.paginator.num_pages }}">&#8677;</a>
+        {% endif %}
+        <form action = "{% url 'books'%}" method="get">
+            <input type="text" name="query" value = {{ request.GET.query }}>
+            <button type="submit">Search</button>
+        </form>
+    </div>
     <div class = "genre_filter">
         <h3>Available genres</h3>
         <ul>
             {% for filter_genre in genres %}
-                <li>{{filter_genre.link_filtered_books}}</li>
+                <li class="{% if filter_genre == genre %}current{% endif %}">{{filter_genre.link_filtered_books}}</li>
             {% endfor %}
         </ul>
     </div>
-    <ul>
+    <ul class="book_list">
         {% comment %} book_list pagal modeli esanti views.py {% endcomment %}
         {% for book in book_list %}
-            <li><a href = "{% url 'book' book.pk %}">{{ book.title }}</a> - {{ book.author.link }}</li>
+            <li class="book">
+                <a href = "{% url 'book' book.pk %}">
+                    {% if book.cover %}
+                        <img src = "{{ book.cover.url }}">
+                    {% else %}
+                        <img src="{% static 'library/img/book.png' %}">
+                    {% endif %}
+                    <h3>{{ book.title }}</h3>
+                </a><p> by {{ book.author.link }}</p>
+            </li>
         {% endfor %}
     </ul>
 {% endblock content %}

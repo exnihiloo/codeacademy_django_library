@@ -51,6 +51,7 @@ class Book(models.Model):
     # cascade jei istrinsime autoriu istrins ir jo visas knygas
     author = models.ForeignKey(Author, on_delete = models.SET_NULL, null = True, blank = True, related_name = 'books',)
     genre = models.ManyToManyField(Genre, help_text = 'Choose genre(s) for this book', verbose_name = 'genre(s)')
+    cover = models.ImageField("cover", upload_to = 'covers', blank = True, null = True)
 
     def __str__(self):
         return f"{self.author} - {self.title}"
