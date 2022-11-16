@@ -15,9 +15,21 @@
         <div class="container">
             {% block nav %}
             <a href="{% url 'index' %}">Home</a>
+            <span class = "spacer"></span>
             <a href="{% url 'authors' %}">Authors</a>
             <a href="{% url 'books' %}">Books</a>
-            <a href="{% url 'admin:index' %}">Admin</a>
+            <span class = "spacer"></span>
+            {% if user.is_authenticated %}
+                <span>{{ user }}</span>
+                <a href="{% url 'user_books' %}">My Books</a>
+                {% if user.is_superuser or user.is_staff %}
+                    <a href="{% url 'admin:index' %}">Admin</a>
+                {% endif %}
+                <a href = "{% url 'logout'%}">Logout</a>
+                {% else %}
+                <a href = "{% url 'login'%}{% if not '/accounts/' in request.path %}?next={{ request.path }}{% endif %}">Login</a>
+                {% comment %} ?next={{ request.path }} - padaro, kad jei nueinam i koki psl, ir is jo jungiames, kad prisijungus mestu tame paciame page, kuriame buvome {% endcomment %}
+                {% endif %}
             {% endblock nav %}
         </div>
     </header>

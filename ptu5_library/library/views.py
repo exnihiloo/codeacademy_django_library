@@ -3,8 +3,7 @@ from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
 from django.views.generic import ListView, DetailView
 from django.core.paginator import Paginator
-
-
+from django.contrib.auth.mixins import LoginRequiredMixin
 from . models import Genre, Author, Book, BookInstance
 # Create your views here.
 
@@ -14,6 +13,8 @@ def index(request):
     book_instance_count = BookInstance.objects.count()
     book_instance_available_count = BookInstance.objects.filter(status = 'a').count()
     author_count = Author.objects.count()
+    visits_count = request.session.get('visits_count', 1)
+    request.session['visits_count'] = visits_count + 1
 
 
     context = {
@@ -22,6 +23,7 @@ def index(request):
         'book_instance_available_count' : book_instance_available_count,
         'author_count' : author_count,
         'genre_count': Genre.objects.count(),
+        'visits_count': visits_count,
     }
 
     return render(request, 'library/index.html', context) 
@@ -81,3 +83,13 @@ class BookDetailView(DetailView):
 #     query = request.GET.get('query')
 #     search_results = Book.objects.filter(Q(title__icontains = query) | Q(summary__icontains = query))
 #     return render(request, 'library/search.html', {'books' : search_results, 'query' : query})
+
+class UserBookListView(LoginRequiredMixin, ListView):
+    model = BookInstance
+    template_name = 'library/user_book_list.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.filter(reader=self.request.user).order_by('due_back')
+        return queryset

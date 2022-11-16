@@ -2,6 +2,8 @@ from django.db import models
 from django.utils.html import format_html
 from django.urls import reverse
 import uuid
+from django.contrib.auth import get_user_model
+from django.utils.timezone import datetime
 
 # Create your models here.
 class Genre(models.Model):
@@ -90,8 +92,22 @@ class BookInstance(models.Model):
         choices = LOAN_STATUS, 
         default = 'm')
 
+    reader = models.ForeignKey(
+        get_user_model(), 
+        verbose_name="reader", 
+        on_delete=models.SET_NULL,
+        null = True, blank = True,
+        related_name='taken_books'
+    )
 
-    def __str__(self):
+    
+    @property
+    def is_overdue(self):
+        if self.due_back and self.due_back < datetime.date(datetime.now()):
+            return True
+        return False
+
+    def __str__(self) -> str:
         return f"{self.unique_id} : {self.book.title}"
 
     class Meta:
