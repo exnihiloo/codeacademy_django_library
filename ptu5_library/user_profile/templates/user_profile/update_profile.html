@@ -1,0 +1,22 @@
+{% extends 'library/base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Updating" %} {{ block.super }} {% trans "User Profile" %}{% endblock title %}
+{% block content %}
+<h1>{% trans "Updating User Profile" %}</h1>
+<form action="" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ user_form.errors }}
+    {{ profile_form.errors }}
+    <div class="table-grid form-grid">
+        <div>{{ user_form.first_name.label }}</div>
+        <div>{{ user_form.first_name }}</div>
+        <div>{{ user_form.last_name.label }}</div>
+        <div>{{ user_form.last_name }}</div>
+        <div>{{ user_form.email.label }}</div>
+        <div>{{ user_form.email }}</div>
+        <div>{{ profile_form.photo.label }}</div>
+        <div>{{ profile_form.photo }}</div>
+    </div>
+    <p><button type="submit">{% trans "Update" %}</button></p>
+</form>
+{% endblock content %}

@@ -173,11 +173,35 @@ table {
     padding: 0.5rem;
 }
 
-.my-books-tables {
-    grid-template-columns: 2fr 1fr 1fr;
+/* formos !!!!!  */ 
+.form-grid{
+    grid-template-columns: 10rem auto;
 }
 
+/* forms  virsuje*/
 
+
+.my-books-tables {
+    grid-template-columns: 5fr 1fr 1fr 2fr;
+}
+
+.form-grid input[type="text"], 
+.form-grid input[type="email"], 
+.form-grid input[type="password"] {
+    width: 90%;
+}
+/* forms */
+.form-grid div {
+    display: inline-block;
+    padding: 0.5rem;
+    align-self: center;
+    justify-self: left;
+}
+
+.form-grid input {
+    width: 15rem;
+}
+/* forms virsuje */
 
 .table-grid-cell {
     display: inline-block;
@@ -203,4 +227,76 @@ table {
     background-color: #f99;
     color: #900;
     font-weight: bold;
+}
+
+/* forms */
+
+.alert {
+    padding: 0.5rem 1rem;
+    border: 3px solid rgb(208, 157, 157);
+}
+
+.alert-error {
+    background-color: red;
+    color: black;
+    border-color: #900;
+}
+
+.alert-success {
+    background-color: green;
+    color: black;
+    border-color: greenyellow;
+}
+
+.float-right {
+    float: right;
+}
+
+.book-review h4 {
+    display: block;
+    padding: 0.5rem 1rem;
+    margin: 0;
+}
+
+.review-form label {
+    display: none;
+
+}
+
+.review-form {
+    background-color: rgba(255, 204, 168, 0.3);
+    border-bottom: 3px solid rgb(205, 144, 144);
+}
+
+.user-profile-photo {
+    max-width: 20rem;
+    border-radius: 5rem;
+    /* padding-right: 1rem; */
+}
+
+.flex-profile {
+    display: flex;
+    place-items: stretch stretch;
+}
+
+.button {
+    background-color: rgb(143, 66, 115);
+    color: #000;
+    text-decoration: none;
+    border: 1px solid #999;
+    border-radius: 0.25rem;
+    padding: 0.25rem;
+}
+
+.button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+
+/* naujas */
+.book-review h4 img{
+    max-height: 1.5rem;
+    float: left;
+    margin-right: 0.5rem;
+    border-radius: 0.5rem;
 }

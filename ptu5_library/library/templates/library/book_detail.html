@@ -1,20 +1,45 @@
 {% extends 'library/base.html' %}
+{% load i18n %}
 {% comment %} detail views kitamasis visada yra object {% endcomment %}
 {% block title %}  {{ object}} {% endblock title %}
 {% block content %}
     <h1>{{ object.title }}</h1>
-    <h3> by {{ object.author.link }}</h3>
+    <h3> {% trans "by" %} {{ object.author.link }}</h3>
     {% if object.isbn %}
         <p>ISBN: {{ object.isbn }}</p>
     {% endif%}
     {% if object.genre %}
-    <p>Genres: {#{ object.genre.all|join:", "}#}
+    <p>{% trans "Genres:" %} {#{ object.genre.all|join:", "}#}
         {% for genre in object.genre.all %}
             {{ genre.link_filtered_books }}
         {% endfor%}
     </p>
     {% endif%}
     <div class = 'summary'>
-        {{ object.summary }}
+        {{ object.summary | safe }}
     </div>
+    <h2>{% trans "Reviews" %}</h2>
+
+    {% if user.is_authenticated %}
+    <p>{% trans "If you have read this book, please leave a review." %}</p>
+    <div class="review-form">
+        <form action="" method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <p><button type="submit">{% trans "Post Review" %}</button></p>
+        </form>
+    </div>
+    {% endif %}
+
+    {% if book.reviews %}
+        {% for review in book.reviews.all %}
+            <div class="book-review">
+                <h4>{% if review.reader.profile.photo %}
+                    <img src="{{ review.reader.profile.photo.url }}"
+                {% endif %}
+                {{review.reader}}<span class="float-right">{{review.created_at | timesince}}</span></h4>
+                <p> {{review.content}}</p>
+            </div>
+        {% endfor %}
+    {% endif %}
 {% endblock content %}

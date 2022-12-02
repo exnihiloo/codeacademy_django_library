@@ -1,10 +1,15 @@
 from django.shortcuts import render, get_object_or_404
 # from django.http import HttpResponse
 from django.db.models import Q
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.core.paginator import Paginator
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from . models import Genre, Author, Book, BookInstance
+from django.views.generic.edit import FormMixin
+from .forms import BookReviewForm, BookInstanceForm, BookInstanceUpdateForm
+from django.urls import reverse, reverse_lazy
+from django.contrib import messages
+from django.utils.translation import gettext_lazy as _
 # Create your views here.
 
 def index(request):
@@ -74,10 +79,40 @@ class BookListView(ListView):
             context['genre'] = get_object_or_404(Genre, id = genre_id)
         return context
 
-class BookDetailView(DetailView):
+class BookDetailView(FormMixin, DetailView):
     model = Book
     template_name = 'library/book_detail.html'
+    form_class = BookReviewForm
 
+    def get_success_url(self):
+        return reverse('book', kwargs={'pk': self.get_object().id})
+
+    def post(self, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            messages.error(self.request, _("You're posting too much!"))
+            return self.form_invalid(form)
+
+
+    def form_valid(self, form):
+        form.instance.book = self.get_object()
+        form.instance.reader = self.request.user
+        form.save()
+        messages.success(self.request, _('Your Review has been posted!'))
+        return super().form_valid(form)
+
+    def get_initial(self):
+        return {
+            'book' : self.get_object(),
+            'reader' : self.request.user
+        }
+    
+
+
+ 
 
 # def search(request):
 #     query = request.GET.get('query')
@@ -87,9 +122,68 @@ class BookDetailView(DetailView):
 class UserBookListView(LoginRequiredMixin, ListView):
     model = BookInstance
     template_name = 'library/user_book_list.html'
-    paginate_by = 10
 
     def get_queryset(self):
         queryset = super().get_queryset()
         queryset = queryset.filter(reader=self.request.user).order_by('due_back')
         return queryset
+
+
+class UserBookInstanceCreateView(LoginRequiredMixin, CreateView):
+    model = BookInstance
+    form_class = BookInstanceForm
+    # fields = ('book', 'due_back',)
+    template_name = 'library/user_bookinstance_form.html'
+    success_url = reverse_lazy('user_books')
+    
+
+    def form_valid(self, form):
+        form.instance.reader = self.request.user
+        form.instance.status = 'r'
+        messages.success(self.request, _('Book reserved.'))
+        return super().form_valid(form)
+
+class UserBookInstanceUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = BookInstance
+    form_class = BookInstanceUpdateForm
+    # fields = ('book', 'due_back',)
+    template_name = 'library/user_bookinstance_form.html'
+    success_url = reverse_lazy('user_books')
+
+
+    def form_valid(self, form):
+        form.instance.reader = self.request.user
+        form.instance.status = 't'
+        messages.success(self.request, _('Book taken or extended.'))
+        return super().form_valid(form)
+
+    def test_func(self):
+        book_instance = self.get_object()
+        return self.request.user == book_instance.reader
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['book_instance'] = self.get_object()
+        if context['book_instance'].status == 't':
+            context['action'] = _('Extend')
+        else:
+            context['action'] = _('Take')
+        return context
+         
+
+class UserBookInstanceDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = BookInstance
+    template_name = 'library/user_bookinstance_delete.html'
+    success_url = reverse_lazy('user_books')
+
+    def test_func(self):
+        book_instance = self.get_object()
+        return self.request.user == book_instance.reader
+
+    def form_valid(self, form):
+        book_instance = self.get_object()
+        if book_instance.status == 't':
+            messages.success(self.request, _('Book returned and burned'))
+        else:
+            messages.success(self.request, _('Book reservation canceled'))
+        return super().form_valid(form)

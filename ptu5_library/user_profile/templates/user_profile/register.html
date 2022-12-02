@@ -1,0 +1,27 @@
+{% extends 'library/base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Register" %} {{ block.super }} {% trans "account" %}{% endblock title %}
+{% block content %}
+<h1>{% trans "Register Library Account" %}</h1>
+
+
+<form action="" method="POST">
+    {% csrf_token %}
+    <div class = "table-grid form-grid">
+        <div> <label for="username">{% trans "Username" %}</label></div>
+        <div><input type="text" name="username" placeholder="Your username" value={{request.POST.username}}></div>
+        <div> <label for="email">{% trans "E-Mail" %}</label></div>
+        <div><input type="text" name="email" placeholder="Your e-mail" value={{request.POST.email}}></div>
+        <div> <label for="password">{% trans "Password" %}</label></div>
+        <div><input type="password" name="password" placeholder="Your password"></div>
+        <div> <label for="password2">{% trans "Repeat password" %}</label></div>
+        <div><input type="password" name="password2" placeholder="Repeat your password"></div>
+        <div><button type="submit">{% trans "Register" %}</button></div>
+
+    </div>
+
+</form>
+
+<p>{% trans "If you have an account already, you can" %} <a href="{% url 'login' %}">{% trans "log in" %} </a>.</p>
+
+{% endblock content %}

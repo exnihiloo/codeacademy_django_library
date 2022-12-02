@@ -1,13 +1,14 @@
 {% extends 'library/base.html' %}
-{% block title %} Welcome to {{ block.super }}{% endblock title %}
+{% load i18n %}
+{% block title %}{% trans "Welcome to" %}{{ block.super }}{% endblock title %}
 {% block content %}
-<h1>PTU5 Library</h1>
+<h1> {% trans "PTU5 Library" %}</h1>
 <ul>
-    <li>Total books: {{ book_count }}</li>
-    <li>Total book copies: {{ book_instance_count }}</li>
-    <li>Available book copies: {{ book_instance_available_count }}</li>
-    <li>Distinct authors: {{ author_count }}</li>
-    <li>Genres: {{ genre_count }}</li>
-    <li>Visits: {{ visits_count }}</li>
+    <li>{% trans "Total books:" %} {{ book_count }}</li>
+    <li>{% trans "Total book copies:" %} {{ book_instance_count }}</li>
+    <li>{% trans "Available book copies:" %} {{ book_instance_available_count }}</li>
+    <li>{% trans "Distinct authors:" %} {{ author_count }}</li>
+    <li>{% trans "Genres:" %} {{ genre_count }}</li>
+    <li>{% trans "Visits:" %} {{ visits_count }}</li>
 </ul>
 {% endblock content %}

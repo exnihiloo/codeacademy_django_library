@@ -38,11 +38,15 @@ class AuthorAdmin(admin.ModelAdmin):
     # list_display_link padaro ant kurio galime spausti,
     # vardo ar pavardes
 
+class BookReviewAdmin(admin.ModelAdmin):
+    list_display = ('book', 'reader', 'created_at',)
+
 
 admin.site.register(models.Author, AuthorAdmin)
 admin.site.register(models.Genre)
 admin.site.register(models.Book, BookAdmin)
 admin.site.register(models.BookInstance, BookInstanceAdmin)
+admin.site.register(models.BookReview, BookReviewAdmin)
 
 
 #  i terminal - from django.core.management.utils import get_random_secret_key  

@@ -1,11 +1,14 @@
 <!DOCTYPE html>
-{% load static%}
+{% load static i18n%}
+{% get_current_language as LANGUAGE_CODE %}
+{% get_available_languages as LANGUAGES %}
+<html lang='{{ LANGUAGE_CODE }}'>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %} Library {% endblock title %}</title>
+    <title>{% block title %} {% trans "Library" %} {% endblock title %}</title>
     <link rel='stylesheet' href="{% static 'library/css/base.css' %}">
 </head>
 <body>
@@ -14,34 +17,51 @@
         {% comment %} ta url 'books' nusirodome pagal tai koki name sukureme urls.py path'uose {% endcomment %}
         <div class="container">
             {% block nav %}
-            <a href="{% url 'index' %}">Home</a>
+            <a href="{% url 'index' %}">{% trans "Home" %}</a>
             <span class = "spacer"></span>
-            <a href="{% url 'authors' %}">Authors</a>
-            <a href="{% url 'books' %}">Books</a>
+            <a href="{% url 'authors' %}">{% trans "Authors" %}</a>
+            <a href="{% url 'books' %}">{% trans "Books" %}</a>
             <span class = "spacer"></span>
             {% if user.is_authenticated %}
-                <span>{{ user }}</span>
-                <a href="{% url 'user_books' %}">My Books</a>
+                <a href="{% url 'profile'%}">{{ user }}</a>
+                <a href="{% url 'user_books' %}">{% trans "My Books" %}</a>
                 {% if user.is_superuser or user.is_staff %}
-                    <a href="{% url 'admin:index' %}">Admin</a>
+                    <a href="{% url 'admin:index' %}">{% trans "Admin" %}</a>
                 {% endif %}
-                <a href = "{% url 'logout'%}">Logout</a>
+                <a href = "{% url 'logout'%}">{% trans "Logout" %}</a>
                 {% else %}
-                <a href = "{% url 'login'%}{% if not '/accounts/' in request.path %}?next={{ request.path }}{% endif %}">Login</a>
+                <a href="{% url 'register' %}">{% trans "Register" %}</a>
+                <a href = "{% url 'login'%}{% if not '/accounts/' in request.path %}?next={{ request.path }}{% endif %}">{% trans "Login" %}</a>
                 {% comment %} ?next={{ request.path }} - padaro, kad jei nueinam i koki psl, ir is jo jungiames, kad prisijungus mestu tame paciame page, kuriame buvome {% endcomment %}
                 {% endif %}
+                <span>
+                    <form action="{% url 'set_language' %}" method="POST">
+                        {% csrf_token %}
+                        <input name="next" type="hidden" value="{{ request.path }}">
+                        <select name="language" onchange="this.form.submit()">
+                            {% for lang in LANGUAGES %}
+                            <option value="{{ lang.0 }}" {% if lang.0 == LANGUAGE_CODE %}selected{% endif %}> {{ lang.1 }}</option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                </span>
             {% endblock nav %}
         </div>
     </header>
     <main>
         <div class="container">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
             {% block content %}
             {% endblock content %}
         </div>
     </main>
     <footer>
         <div class="container">
-            {% block footer %}<p> (C) 2022 PTU5 kurso biblioteka </p>{% endblock footer %}
+            {% block footer %}<p>{% trans "(C) 2022 PTU5 library" %}</p>{% endblock footer %}
         </div>
     </footer>
 </body>
